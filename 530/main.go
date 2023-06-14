@@ -11,43 +11,27 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
-func notNil(root *TreeNode) bool {
-	return root != nil
-}
-
-func difference(root *TreeNode, node *TreeNode) int {
-	if root.Val > node.Val {
-		return root.Val - node.Val
-	} else {
-		return node.Val - root.Val
-	}
-}
-
-func getMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+// TODO: make it faster
 
 func getMinimumDifference(root *TreeNode) int {
-	minDifference := math.MaxInt
+	minDiff := math.MaxInt64
+	prev := -1
 
-	if notNil(root.Left) {
-		diff := difference(root, root.Left)
-
-		minDifference = getMin(minDifference, getMinimumDifference(root.Left))
-		minDifference = getMin(minDifference, diff)
+	var move func(node *TreeNode)
+	move = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+		move(node.Left)
+		if prev != -1 && node.Val-prev < minDiff {
+			minDiff = node.Val - prev
+		}
+		prev = node.Val
+		move(node.Right)
 	}
 
-	if notNil(root.Right) {
-		diff := difference(root, root.Right)
-
-		minDifference = getMin(minDifference, getMinimumDifference(root.Right))
-		minDifference = getMin(minDifference, diff)
-	}
-
-	return minDifference
+	move(root)
+	return minDiff
 }
 
 func main() {
@@ -74,5 +58,16 @@ func main() {
 		},
 	}
 
+	var second_test *TreeNode = &TreeNode{
+		Val:  1,
+		Left: nil,
+		Right: &TreeNode{
+			Val:   2,
+			Left:  nil,
+			Right: nil,
+		},
+	}
+
 	fmt.Println(getMinimumDifference(first_test))
+	fmt.Println(getMinimumDifference(second_test))
 }
